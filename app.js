@@ -3,7 +3,7 @@ $(document).ready(function () {
     items: [
       {
         name: 'apples',
-        checked: true
+        checked: false
       },
       {
         name: 'oranges',
@@ -19,6 +19,10 @@ $(document).ready(function () {
       }
     ]
   };
+
+  var deleteItem = function(state, item) {
+    state.items.splice(item, 1);
+  }
 
   var addItem = function(state, item) {
       var obj = {
@@ -46,10 +50,10 @@ $(document).ready(function () {
 
       if (item.checked) {
 
-        item = '<li data="' + dataAttr + '">' + '<span class="shopping-item shopping-item__checked">' + item.name + '</span>' + template + '</li>';
+        item = '<li data-index="' + dataAttr + '">' + '<span class="shopping-item shopping-item__checked">' + item.name + '</span>' + template + '</li>';
       } else {
 
-        item = '<li data="' + dataAttr + '">' + '<span class="shopping-item">' + item.name + '</span>' + template + '</li>';
+        item = '<li data-index="' + dataAttr + '">' + '<span class="shopping-item">' + item.name + '</span>' + template + '</li>';
       }
       
       dataAttr++;
@@ -62,18 +66,32 @@ $(document).ready(function () {
   $('#js-shopping-list-form').submit(function(event) {
       event.preventDefault();
       addItem(state, $('#shopping-list-entry').val());
-      renderList(state, $('.shopping-list'));
+      init();
+      $('#shopping-list-entry').val('');
   });
 
   var init = function () {
     renderList(state, $('.shopping-list'));
-  };
-   
-  init();
 
-  $('.shopping-item-toggle').on('click', function (event) {
-    $(event.target).closest('li').toggleClass('shopping-item__checked');
+  $('.shopping-item-toggle').on('click', function(event) {
+    var itemsIndex = 0;
 
+    $(this).closest('li').toggleClass('shopping-item__checked');
+    itemsIndex = $(this).closest('li').data('index');
+    state.items[itemsIndex].checked = !state.items[itemsIndex].checked;
   });
+
+  $('.shopping-item-delete').on('click', function(event) {
+    event.preventDefault();
+    var itemsIndex = 0;
+    
+    itemsIndex = $(this).closest('li').data('index');
+    deleteItem(state, itemsIndex);
+    init();
+  });
+
+  };
+
+  init();
 
 });
